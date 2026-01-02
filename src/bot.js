@@ -1,34 +1,56 @@
-const { Client, Events, GatewayIntentBits, EmbedBuilder } = require('discord.js');
-const axios = require('axios'); // For fetching memes
-require('dotenv').config();
 
-const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+const Discord = require('discord.js'); 
+const axios = require('axios');        
+require('dotenv').config();          
+
+
+const client = new Discord.Client({
+    intents: [
+        Discord.GatewayIntentBits.Guilds, 
+        Discord.GatewayIntentBits.GuildMessages, 
+        Discord.GatewayIntentBits.MessageContent
+    ]
 });
 
-client.once(Events.ClientReady, c => {
-    console.log(`🚀 Booted! Logged in as ${c.user.tag}`);
+
+client.once('ready', () => {
+    console.log("The bot is now online! 🚀");
 });
 
-client.on(Events.MessageCreate, async message => {
-    if (message.author.bot) return;
 
-    // 1. !meme command
-    if (message.content === '!meme') {
-        const res = await axios.get('https://meme-api.com/gimme');
-        const embed = new EmbedBuilder()
-            .setTitle(res.data.title)
-            .setImage(res.data.url)
-            .setFooter({ text: `Subreddit: r/${res.data.subreddit}` })
-            .setColor(0xffcc00);
+client.on('messageCreate', async (message) => {
+    
+    
+    if (message.author.bot === true) {
+        return;
+    }
+
+    
+    if (message.content === "!meme") {
+      
+        const response = await axios.get('https://meme-api.com/gimme');
+        const memeData = response.data;
+
         
-        message.reply({ embeds: [embed] });
+        const memeEmbed = new Discord.EmbedBuilder()
+            .setTitle(memeData.title)
+            .setImage(memeData.url)
+            .setColor("Yellow")
+            .setFooter({ text: "From subreddit: " + memeData.subreddit });
+
+        
+        message.reply({ embeds: [memeEmbed] });
     }
 
-    // 2. !user command
-    if (message.content === '!user') {
-        message.reply(`This command was run by ${message.author.username}, who joined Discord on ${message.author.createdAt.toDateString()}.`);
+
+    else if (message.content === "!user") {
+        const name = message.author.username;
+        const date = message.author.createdAt.toDateString();
+        
+        message.reply("You are " + name + " and you created your account on " + date);
     }
 });
 
-client.login(process.env.BOT_TOKEN);
+
+const myToken = process.env.BOT_TOKEN;
+client.login(myToken);
