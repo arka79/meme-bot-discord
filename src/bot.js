@@ -1,8 +1,19 @@
 
 const Discord = require('discord.js'); 
-const axios = require('axios');        
+const axios = require('axios');   
+const express = require('express');     
 require('dotenv').config();          
 
+const app = express();
+const port = process.env.PORT || 10000;
+
+app.get('/', (req, res) => {
+  res.send('Bot is online and healthy!');
+});
+
+app.listen(port, () => {
+  console.log(`Web server listening on port ${port}`);
+});
 
 const client = new Discord.Client({
     intents: [
